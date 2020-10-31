@@ -11,9 +11,10 @@ def limpieza_datos(data_path,avaluo,general_asp,detail_asp):
     municipios_sp = ["Chiquinquira", "Cumaribo", "Ricaurte", "Risaralda", "Tenjo"]
     terrenos_sp = ["R_TERRENO.shp", "U_TERRENO.shp"]
     permutations = [(m, t) for m in municipios_sp for t in terrenos_sp]
+    permutations.pop(2) #no hay shape de cumaribo rural
     
     # create file name
-    files = data_path+"/Informacion_Geografica.zip!{}/{}"
+    files ="zip://" + data_path.replace("\\", "/")+"/Informacion_Geografica.zip!{}/{}"
     
     # create empty dataframe
     shapes = gpd.GeoDataFrame()
@@ -41,8 +42,8 @@ def limpieza_datos(data_path,avaluo,general_asp,detail_asp):
     
     # create centroid of polygons, latitude and longitude variables
     shapes["centroid"] = shapes["geometry"].centroid
-    shapes["lon"] = shapes["centroid"].x
-    shapes["lat"] = shapes["centroid"].y
+    shapes["lon"] = shapes.centroid.x
+    shapes["lat"] = shapes.centroid.y
        
     mun_code = {
         'Pereira':66001,'Apía':66045,'Balboa':66075,'Belén de Umbría':66088,
