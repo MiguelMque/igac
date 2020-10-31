@@ -56,7 +56,7 @@ def diccionario(nuevo_texto):
 
 ## parametros fijos
 
-def webscrapping(data_path,weblink):
+def webscrapping(data_path, weblink):
     
     # date time
     now = dt.datetime.now()
@@ -69,6 +69,16 @@ def webscrapping(data_path,weblink):
 
     # pagina inicial a buscar
     #weblink = "https://www.fincaraiz.com.co/arriendos/"
+
+    # nombrar el weblink
+    ubicacion = weblink.split("/")[5].lower()
+    tipo_inmueble = weblink.split("/")[3].lower()
+    tipo_negocio = weblink.split("/")[4].lower()
+    fecha = now.year * 10000 + now.month * 100 + now.day
+    file_name = (
+        "fincaraiz-{}-{}_{}-{}.csv"
+        .format(ubicacion, tipo_inmueble, tipo_negocio, fecha)
+    )
 
     # desahilitar advertencias
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -125,8 +135,8 @@ def webscrapping(data_path,weblink):
 
         # mostrar avance
         texto = (
-            "\rProcesado: " + str(i+1) + "/" + str(len(urls)) + " " + 
-            str(100*(i+1)/len(urls)) + "%"
+            "Procesado: " + str(i+1) + "/" + str(len(urls)) + " " + 
+            str(100*(i+1)/len(urls)) + "%\r "
         )
         if i + 1 == len(urls):
             texto += "\r"
@@ -184,5 +194,5 @@ def webscrapping(data_path,weblink):
     print("Se demoró (HH:MM:SS): ", dt.datetime.now()-now)
 
     # guardar dataframe
-    df.to_csv(data_path+"/webscrapping_fr.csv", index=False)
+    df.to_csv(data_path + file_name, index=False)
     return df
