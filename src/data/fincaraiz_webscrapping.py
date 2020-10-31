@@ -17,9 +17,11 @@ Original file is located at
 # Description: webscrapping of fincaraiz website
 #
 #
-# v3
-# Modification:
-# Description:
+# example of use:
+#>>>ciudad = webscrapping(
+#               "path_of_directory", 
+#               "www.fincaraiz.com.co/Vivienda/venta/medellin"
+#)
 #-------------------------------------------------------------------------
 """
 
@@ -135,8 +137,8 @@ def webscrapping(data_path, weblink):
 
         # mostrar avance
         texto = (
-            "Procesado: " + str(i+1) + "/" + str(len(urls)) + " " + 
-            str(100*(i+1)/len(urls)) + "%\r "
+            "\rProcesado: " + str(i+1) + "/" + str(len(urls)) + " " + 
+            str(100*(i+1)/len(urls)) + "%"
         )
         if i + 1 == len(urls):
             texto += "\r"
