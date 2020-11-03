@@ -281,22 +281,6 @@ homogeneos.isna().any()
 hom3.isna().any()
 
 hom3
-geometry_p2 = gpd.points_from_xy(hom3.lon, hom3.lat)
-hom3 = gpd.GeoDataFrame(hom3, geometry=geometry_p2)
-
-fjoin = gpd.sjoin(data, hom3, op="contains")
-
-print(fjoin.shape)
-print(hom3.shape)
-
-fjoin.head()
-
-data = data.to_crs("EPSG:4326")
-
-fjoin[["NOMBRE_DPT", "NOMBRE_MPI"]+[*hom3.columns]]
-
-pd.crosstab(fjoin["NOMBRE_DPT"], fjoin["departamento"])
-#pd.crosstab(fjoin["NOMBRE_MPI"], fjoin["municipio"])
 
 hom3["municipio"].fillna("NA", inplace=True)
 
