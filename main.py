@@ -9,12 +9,13 @@ from sklearn.model_selection import train_test_split
 #from src.features.limpieza_de_datos_igac import limpieza_datos
 from src.features.limpieza_datos_exogena import concat_data_exogena
 from src.data.fincaraiz_webscrapping import webscrapping
+from src.visualization.eda_exogena import eda_exogena
 
 if __name__ == "__main__":
     DATA_PATH = os.path.join(os.getcwd(), "data")
     MODELS_PATH = os.path.join(os.getcwd(), "models")
     #model_path = os.path.join(MODELS_PATH, model_name + "_" + model_version)
-    IMAGES_PATH=os.path.join(os.getcwd(),'reports','figures')
+    IMAGE_PATH=os.path.join(os.getcwd(),'reports','figures')
     lista_municipios=["villavicencio", "fusagasuga", "manizales"]
     weblinks = [
     "https://www.fincaraiz.com.co/Inmuebles_Comerciales/venta/villavicencio/",
@@ -37,7 +38,7 @@ if __name__ == "__main__":
             print(weblink,' creado') 
    
     datos_modelo=concat_data_exogena(DATA_PATH,lista_municipios)#leer los datos del webscapping, los concatena, los limpia y agrega dummies
-    
+    eda_exogena(DATA_PATH,IMAGE_PATH)
 
     
     
