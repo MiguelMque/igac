@@ -3,9 +3,12 @@
 # import modules
 import numpy as np
 import pandas as pd
+import geopandas as gpd
 import glob
 
-def concat_data_exogena(data_path, municipios_prop=[], limpiar=True, dumm=True):
+def concat_data_exogena(
+    data_path, municipios_prop=[], return_df=True, limpiar=True, dumm=False
+):
     """
     Concatena la información exógena de fincaraiz y properati
     
@@ -23,6 +26,8 @@ def concat_data_exogena(data_path, municipios_prop=[], limpiar=True, dumm=True):
         raise TypeError("Error, data_path debe ser de tipo string")
     if not isinstance(municipios_prop, list):
         raise TypeError("Error, municipios_prop debe ser de tipo list")
+    if not isinstance(return_df, bool):
+        raise TypeError("Error, return_df debe ser de tipo bool")
     if not isinstance(limpiar, bool):
         raise TypeError("Error, limpiar debe ser de tipo bool")
     if not isinstance(dumm, bool):
@@ -111,11 +116,14 @@ def concat_data_exogena(data_path, municipios_prop=[], limpiar=True, dumm=True):
 
     # retornar datos si no se necesitan limpiar
     if not limpiar:
-        data_for_model.to_csv(data_path + "data_for_model.csv", index=False)
-        return data_for_model
+        file_name = data_path + "data_for_model.csv"
+        data_for_model.to_csv(file_name, index=False)
+        print("Archivo guardado en {}".format(file_name))
+        if return_df:
+            return data_for_model
     
     ## limpieza
-    
+
     # lat lon fuera del pais, valores y areas nulas
     dfm2 = data_for_model[
         (~data_for_model["valor"].isna()) & 
@@ -131,19 +139,39 @@ def concat_data_exogena(data_path, municipios_prop=[], limpiar=True, dumm=True):
         (dfm2["area"]<10000000)
     ]
 
+    # convertir en datos espaciales
+    geometry_dfm3 = gpd.points_from_xy(dfm3.lon, dfm3.lat)
+    dfm3 = gpd.GeoDataFrame(dfm3, geometry=geometry_dfm3)
+    
+    # lectura de shapes municipios colombia
+    shapes = gpd.read_file("zip://mpio.zip!mpio.shp")
+    shapes = shapes.to_crs("EPSG:4326")
+    
+    # cruzar
+    join = gpd.sjoin(shapes, dfm3, op="contains")
+
+    # filtro y convertir a dataframe
+    dfm4 = join[
+        join["NOMBRE_MPI"]==join["municipio"].str.upper().str.replace("Á", "A")
+    ]
+    dfm4 = dfm4[dfm3.columns].drop(columns="geometry")
+
     ## dummies
     
     # si no quiere dummies
     if not dumm:
-        dfm3.to_csv(data_path + "data_for_model_clean.csv", index=False)
-        return dfm3
+        file_name = data_path + "data_for_model_clean.csv"
+        dfm4.to_csv(file_name, index=False)
+        print("Archivo guardado en {}".format(file_name))
+        if return_df:
+            return dfm4
     
     # reemplazar municipio
-    dfm3["municipio"].fillna("NA", inplace=True)
+    dfm4["municipio"].fillna("NA", inplace=True)
 
     # crear dummies departamento, municipio y tipo
     depts_dum = pd.get_dummies(
-        dfm3["departamento"]
+        dfm4["departamento"]
         .str.lower()
         .str.replace("á","a")
         .str.replace("é","e")
@@ -153,7 +181,7 @@ def concat_data_exogena(data_path, municipios_prop=[], limpiar=True, dumm=True):
         .str.capitalize()
     )
     muns_dum = pd.get_dummies(
-        dfm3["municipio"]
+        dfm4["municipio"]
         .str.lower()
         .str.replace("á","a")
         .str.replace("é","e")
@@ -165,7 +193,7 @@ def concat_data_exogena(data_path, municipios_prop=[], limpiar=True, dumm=True):
     )
 
     types_dum = pd.get_dummies(
-        dfm3["tipo"]
+        dfm4["tipo"]
         .str.lower()
         .str.replace("á","a")
         .str.replace("é","e")
@@ -175,7 +203,7 @@ def concat_data_exogena(data_path, municipios_prop=[], limpiar=True, dumm=True):
         .str.capitalize()
     )
 
-    dfm4 = pd.concat(
+    dfm5 = pd.concat(
         [
             depts_dum, muns_dum, types_dum, 
             dfm3.drop(columns=["departamento", "municipio", "tipo"])
@@ -183,6 +211,10 @@ def concat_data_exogena(data_path, municipios_prop=[], limpiar=True, dumm=True):
         axis=1
     )
 
-    dfm4.to_csv(data_path + "data_for_model_clean_dummies.csv", index=False)
-    return dfm4
+    file_name = data_path + "data_for_model_clean_dummies.csv"
+    dfm5.to_csv(file_name, index=False)
+    print("Archivo guardado en {}".format(file_name))
+
+    if return_df:
+        return dfm5
 
