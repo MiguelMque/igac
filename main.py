@@ -3,12 +3,14 @@ import pandas as pd
 import tensorflow as tf
 import glob
 import os
+from getpass import getpass
 from sklearn.model_selection import train_test_split
 
 #from src.data.make_dataset import leer_csv_fr,leer_csv_datosigac
 #from src.features.limpieza_de_datos_igac import limpieza_datos
 from src.features.limpieza_datos_exogena import concat_data_exogena
 from src.data.fincaraiz_webscrapping import webscrapping
+from src.data.api_here import near_places
 from src.visualization.eda_exogena import eda_exogena
 
 if __name__ == "__main__":
@@ -38,6 +40,10 @@ if __name__ == "__main__":
             print(weblink,' creado') 
    
     datos_modelo=concat_data_exogena(DATA_PATH,lista_municipios)#leer los datos del webscapping, los concatena, los limpia y agrega dummies
+    
+    # preguntar por la api de here
+    api_key = getpass("Introduzca la KEY de la API de HERE:")
+    datos_lugares = near_places(api_key, data=datos_modelo)
     eda_exogena(DATA_PATH,IMAGE_PATH)
 
     
