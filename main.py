@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 #from src.features.limpieza_de_datos_igac import limpieza_datos
 from src.features.limpieza_datos_exogena import concat_data_exogena
 from src.data.fincaraiz_webscrapping import webscrapping
-from src.data.api_here import near_places
+from src.features.api_here import near_places
 from src.visualization.eda_exogena import eda_exogena
 
 if __name__ == "__main__":

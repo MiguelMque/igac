@@ -63,7 +63,7 @@ def near_places(
     # definir lugares a buscar
     if places_list == []:
         places_list = [
-            "healt", "hospital",
+            "health", "hospital",
             "cafe", "restaurant", "bar", "club",
             "entertainment", "park", "museum", "zoo", "church", "hotel",
             "education", "university", "school",  
