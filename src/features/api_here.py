@@ -70,19 +70,18 @@ def near_places(
             "shopping mall", "shop", "supermarket",
             "transport", "police",
         ]
-        # old list
-        #places_list = [
-        #"hospital", "cafe", "park", "church", "shopping mall", "school", 
-        #"univerity", "transport", "police", "shop", "supermarket",
-        #"hotel", "education"
-        #]
-        
 
     # hacer el request
     for place in places_list:
         data[place] = _lista_lugares(conn, data, lat, lon, place=place)
 
     # guardar y retornar
+    if file_name != "":
+        file_name = "data_for_model_clean.csv"
+    
+    if data_path == "":
+        ".\data\"
+
     new_file_name = data_path + file_name.replace(".csv", "_places.csv")
     data.to_csv(new_file_name, index=False)
     print("Archivo guardado en {}".format(new_file_name))
