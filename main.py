@@ -50,7 +50,8 @@ if __name__ == "__main__":
    
     # leer los datos del webscapping, los concatena, los limpia
     datos_modelo = concat_data_exogena(
-        DATA_PATH, lista_municipios, engine=engine1, engine2=engine2
+        DATA_PATH, engine=engine1, engine2=engine2, 
+        municipios_prop=lista_municipios
     ) 
     
     # preguntar por la key api de here
