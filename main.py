@@ -5,6 +5,7 @@ import glob
 import os
 from getpass import getpass
 from sklearn.model_selection import train_test_split
+from sqlalchemy import create_engine
 
 #from src.data.make_dataset import leer_csv_fr,leer_csv_datosigac
 #from src.features.limpieza_de_datos_igac import limpieza_datos
@@ -14,6 +15,8 @@ from src.features.api_here import near_places
 from src.visualization.eda_exogena import eda_exogena
 
 if __name__ == "__main__":
+    engine1=create_engine('postgresql://topscorer:topscorer@67.205.164.197:5432/db_crudos')
+    engine2=create_engine('postgresql://topscorer:topscorer@67.205.164.197:5432/db_resultados');
     DATA_PATH = os.path.join(os.getcwd(), "data")
     MODELS_PATH = os.path.join(os.getcwd(), "models")
     #model_path = os.path.join(MODELS_PATH, model_name + "_" + model_version)
@@ -39,11 +42,12 @@ if __name__ == "__main__":
             webscrapping(DATA_PATH,weblink)
             print(weblink,' creado') 
    
-    datos_modelo=concat_data_exogena(DATA_PATH,lista_municipios)#leer los datos del webscapping, los concatena, los limpia y agrega dummies
+    #datos_modelo=concat_data_exogena(DATA_PATH,lista_municipios)#leer los datos del webscapping, los concatena, los limpia y agrega dummies
+    datos_modelo=concat_data_exogena(DATA_PATH,lista_municipios,engine=engine1,engine2=engine2)#leer los datos del webscapping, los concatena, los limpia y agrega dummies
     
     # preguntar por la api de here
     api_key = getpass("Introduzca la KEY de la API de HERE:")
-    datos_lugares = near_places(api_key, data=datos_modelo)
+    datos_lugares = near_places(api_key, data=datos_modelo,engine=engine2)
     eda_exogena(DATA_PATH,IMAGE_PATH)
 
     
