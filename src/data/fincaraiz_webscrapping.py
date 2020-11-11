@@ -52,7 +52,10 @@ def diccionario(nuevo_texto):
 
 ## parametros fijos
 
-def webscrapping(data_path, weblink, max_number_page=7000):
+def webscrapping(
+    data_path, weblink, engine="", max_number_page=7000, 
+    return_df=False
+):
     """
     Webscrapping del sitio fincaraiz. Cada inmueble se demora ~1 seg.
     
@@ -69,6 +72,14 @@ def webscrapping(data_path, weblink, max_number_page=7000):
     if not isinstance(max_number_page, int):
         raise TypeError("Error, max_number_page debe ser de tipo int")
     
+    # advertencia
+    print(
+        """
+        Para realizar el WebScraping necesita una velocidad de conexión a 
+        internet alta (superior a 150 mbs/s)
+        """
+    )
+
     # date time
     now = dt.datetime.now()
 
@@ -203,6 +214,11 @@ def webscrapping(data_path, weblink, max_number_page=7000):
     print("Se demoró (HH:MM:SS): ", dt.datetime.now()-now)
 
     # guardar dataframe
-    df.to_csv(data_path + file_name, index=False)
-    return df
+    if engine != "":
+        df.to_csv(data_path + file_name, index=False)
+    else:
+        df.to_sql(file_name[:-4], engine)
+
+    if return_df:
+        return df
 

@@ -23,7 +23,7 @@ nltk.download('stopwords')
 sns.set_style("white")
 
 
-def eda_exogena(data_path, image_path):
+def eda_exogena(data_path, image_path, engine):
     """
     Análisis Exploratorio de los Datos exógenos
 
@@ -41,8 +41,11 @@ def eda_exogena(data_path, image_path):
 
     ## datos
 
-    # leer datos
-    df = pd.read_csv(data_path + "data_for_model_clean_places.csv")
+    # # leer datos
+    # df = pd.read_csv(data_path + "data_for_model_clean_places.csv")
+
+    # leer datos 
+    df = pd.read_sql("data_for_model_clean_places", engine)
 
     # crear variables extras
     df["valor_mill"] = df["valor"]/1000000

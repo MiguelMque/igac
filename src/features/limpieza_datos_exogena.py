@@ -8,7 +8,8 @@ import glob
 from sqlalchemy import create_engine
 
 def concat_data_exogena(
-    data_path, municipios_prop=[], return_df=True, limpiar=True, dumm=False,engine,engine2
+    data_path, engine, engine2, 
+    municipios_prop=[], return_df=True, limpiar=True, dumm=False
 ):
     """
     Concatena la información exógena de fincaraiz y properati
@@ -39,22 +40,21 @@ def concat_data_exogena(
     ### lectura y unificacion archivos
 
     ## fincaraiz
-    """
-    # leer archivos vivienda (v) y comerciales (v)
-    fr_files = glob.glob(data_path + "fincaraiz*")
-    fr_v_dfs = [pd.read_csv(fr) for fr in fr_files if fr.count("vivienda")>0]
-    fr_c_dfs = [pd.read_csv(fr) for fr in fr_files if fr.count("vivienda")==0]
-    fincaraiz_v = pd.concat(fr_v_dfs)
-    fincaraiz_c = pd.concat(fr_c_dfs)
+    
+    # # leer archivos vivienda (v) y comerciales (c)
+    # fr_files = glob.glob(data_path + "fincaraiz*")
+    # fr_v_dfs = [pd.read_csv(fr) for fr in fr_files if fr.count("vivienda")>0]
+    # fr_c_dfs = [pd.read_csv(fr) for fr in fr_files if fr.count("vivienda")==0]
+    # fincaraiz_v = pd.concat(fr_v_dfs)
+    # fincaraiz_c = pd.concat(fr_c_dfs)
  
-    """    
-    #leer datos desde servidor
-    fr_files0=engine.table_names()
-    fr_files=[fr for fr in fr_files0 if fr.count("fincaraiz")>0]
-    fr_v_dfs = [pd.read_sql(fr,engine) for fr in fr_files if fr.count("vivienda")>0]
-    fr_c_dfs = [pd.read_sql(fr,engine) for fr in fr_files if fr.count("vivienda")==0]
-    fincaraiz_v = pd.concat(fr_v_dfs)
-    fincaraiz_c = pd.concat(fr_c_dfs)  
+    # leer datos desde servidor
+    fr_files0 = engine.table_names()
+    fr_files = [fr for fr in fr_files0 if fr.count("fincaraiz")>0]
+    fr_v = [pd.read_sql(fr,engine) for fr in fr_files if fr.count("vivienda")>0]
+    fr_c = [pd.read_sql(fr,engine) for fr in fr_files if fr.count("vivienda")==0]
+    fincaraiz_v = pd.concat(fr_v)
+    fincaraiz_c = pd.concat(fr_c)  
     
     # filtrar y unificar
     fr_vars = [
@@ -74,12 +74,11 @@ def concat_data_exogena(
     fincaraiz2["fr_dataset"] = "fincaraiz"
 
     ## properati
-    """
-    # lectura
-    properati = pd.read_csv(data_path + "co_properties.csv")
-    """
-    #lectura properati servidor
-    properati=pd.read_sql('co_properties',engine)
+    # # lectura
+    # properati = pd.read_csv(data_path + "co_properties.csv")
+    
+    # lectura properati servidor
+    properati = pd.read_sql('co_properties',engine)
     
     # filtrar y unificar
     properati["property_type"] = (
@@ -131,7 +130,7 @@ def concat_data_exogena(
     if not limpiar:
         file_name = data_path + "data_for_model.csv"
         #data_for_model.to_csv(file_name, index=False)
-        data_for_model.to_sql('data_for_model',engine2)
+        data_for_model.to_sql('data_for_model', engine2)
         print("Archivo guardado en {}".format(file_name))
         if return_df:
             return data_for_model
@@ -156,13 +155,13 @@ def concat_data_exogena(
     # convertir en datos espaciales
     geometry_dfm3 = gpd.points_from_xy(dfm3.lon, dfm3.lat)
     dfm3 = gpd.GeoDataFrame(dfm3, geometry=geometry_dfm3)
-    """
-    # lectura de shapes municipios colombia
-    shapes = gpd.read_file("zip://mpio.zip!mpio.shp")
-    shapes = shapes.to_crs("EPSG:4326")
-    """
+    
+    # # lectura de shapes municipios colombia
+    # shapes = gpd.read_file("zip://mpio.zip!mpio.shp")
+    # shapes = shapes.to_crs("EPSG:4326")
+    
     # lectura de shapes municipios colombia desde servidor
-    shapes = gpd.read_postgis('mpio',engine,geom_col='geometry')
+    shapes = gpd.read_postgis('mpio', engine, geom_col='geometry')
     shapes = shapes.to_crs("EPSG:4326")
     
     # cruzar
@@ -180,7 +179,7 @@ def concat_data_exogena(
     if not dumm:
         file_name = data_path + "data_for_model_clean.csv"
         #dfm4.to_csv(file_name, index=False)
-        dfm4.to_sql('data_for_model_clean',engine2)
+        dfm4.to_sql('data_for_model_clean', engine2)
         print("Archivo guardado en {}".format(file_name))
         if return_df:
             return dfm4
@@ -232,7 +231,7 @@ def concat_data_exogena(
 
     file_name = data_path + "data_for_model_clean_dummies.csv"
     #dfm5.to_csv(file_name, index=False)
-    dfm5.to_sql('data_for_model_clean_dummies',engine2)
+    dfm5.to_sql('data_for_model_clean_dummies', engine2)
     print("Archivo guardado en {}".format(file_name))
 
     if return_df:

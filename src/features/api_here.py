@@ -19,8 +19,8 @@ def _lista_lugares(conn, df, lat, lon, radius=1000, place="hospital"):
     return list(map(fun, new_df))
 
 def near_places(
-    api_key, data_path="", file_name="", data=None, lat="lat", lon="lon", 
-    places_list=[], return_df=True,engine
+    api_key, engine, data_path="", file_name="", data=None,
+    lat="lat", lon="lon", places_list=[], return_df=True
 ):
     """Lectura de la informacion limpia y consulta de la api"""
 
@@ -47,10 +47,12 @@ def near_places(
     
     # carga de la informacion
     if data is None:
-        if not file_name.endswith(".csv"):
-            raise RuntimeError("Error, datos deben estar en formato csv")
-        #data = pd.read_csv(data_path + file_name)
-        data=pd.read_sql(file_name,engine)
+        # if not file_name.endswith(".csv"):
+        #    raise RuntimeError("Error, datos deben estar en formato csv")
+        # data = pd.read_csv(data_path + file_name)
+        if file_name.endswith(".csv"):
+            file_name = file_name[:-4]
+        data = pd.read_sql(file_name, engine)
 
     # verificar que la informacion tenga lat y lon
     if lat not in data.columns:
@@ -83,10 +85,10 @@ def near_places(
     if data_path == "":
         ".\\data\\"
 
-    #new_file_name = data_path + file_name.replace(".csv", "_places.csv")
-    new_file_name= file_name.replace(".csv", "_places")
-    #data.to_csv(new_file_name, index=False)
-    data.to_sql(new_file_name,engine2)
+    # new_file_name = data_path + file_name.replace(".csv", "_places.csv")
+    new_file_name = file_name + "_places"
+    # data.to_csv(new_file_name, index=False)
+    data.to_sql(new_file_name, engine)
     print("Archivo guardado en {}".format(new_file_name))
     
     if return_df:
