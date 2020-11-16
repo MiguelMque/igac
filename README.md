@@ -1,8 +1,9 @@
 # FinalProject_Team3
  Data analysis and models to calculate appraisal of municipalities in Colombia
 
-IMPORTANTE:
-El webscrapping solo funciona en google collab o con una buena conexión a internet.
+IMPORTANT:
+Webscrapping only works on google collab or with a good internet connection.
 
-El archivo main.py que se encuentra en la raiz del repositorio produce al archivo que 
-necesita la aplicacion, que se encuentra en la carpeta Dash App_3 que tiene su propio main.py
+The main.py file located on the repository root produces the data file that
+the application uses, the application is located on the folder Dash App_4 and has its own 
+main.py file
